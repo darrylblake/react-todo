@@ -8,9 +8,9 @@ var rootUrl = 'https://sg-react-todo.firebaseio.com/';
 var App = React.createClass({
   mixins: [ ReactFire ],
   componentWillMount: function() {
-    var fb = new Firebase(rootUrl + 'items/');
-    this.bindAsObject(fb, 'items'); // this.state.items
-    fb.on('value', this.handleDataLoaded);
+    this.fb = new Firebase(rootUrl + 'items/');
+    this.bindAsObject(this.fb, 'items'); // this.state.items
+    this.fb.on('value', this.handleDataLoaded);
   },
   getInitialState: function() {
     return {
@@ -19,7 +19,7 @@ var App = React.createClass({
     }
   },
   render: function() {
-    return <div className="row panel panel-default">
+    return <div className="row">
       <div className="col-md-8 col-md-offset-2">
         <h2 className="text-center">
           To-do List
@@ -28,12 +28,35 @@ var App = React.createClass({
         <hr />
         <div className={"content" + (this.state.loaded ? ' loaded' : '')}>
           <List items={this.state.items} />
+          {this.deleteButton()}
         </div>
       </div>
     </div>
   },
   handleDataLoaded: function() {
     this.setState({loaded: true});
+  },
+  deleteButton: function() {
+    if (!this.state.loaded) {
+      return null;
+    } else {
+      return <div className="text-center clear-complete">
+        <hr />
+        <button
+          type="button"
+          onClick={this.handleDeleteDoneClick}
+          className="btn btn-default btn-lg">
+          Clear Completed
+        </button>
+      </div>
+    }
+  },
+  handleDeleteDoneClick: function() {
+    for (var key in this.state.items) {
+      if(this.state.items[key].done === true) {
+        this.fb.child(key).remove();
+      }
+    }
   }
 });
 
