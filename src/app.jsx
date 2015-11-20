@@ -2,12 +2,18 @@ var React = require('react');
 var ReactFire = require('reactfire'); // Interact with data received from Firebase
 var Firebase = require('firebase'); // Library. Communicate with Firebase
 var Header = require('./header');
+var List = require('./list');
 var rootUrl = 'https://sg-react-todo.firebaseio.com/';
 
 var App = React.createClass({
   mixins: [ ReactFire ],
   componentWillMount: function() {
     this.bindAsObject(new Firebase(rootUrl + 'items/'), 'items'); // this.state.items
+  },
+  getInitialState: function() {
+    return {
+      items: {}
+    }
   },
   render: function() {
     return <div className="row panel panel-default">
@@ -16,6 +22,7 @@ var App = React.createClass({
           To-do List
         </h2>
         <Header itemsStore={this.firebaseRefs.items} />
+        <List items={this.state.items} />
       </div>
     </div>
   }
